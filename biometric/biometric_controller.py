@@ -11,7 +11,7 @@
 from garmin_driver import get_biometric_data
 # from alert_controller import receive_alert
 
-# Temporary, for testing purposes
+# Temporary - for testing purposes
 def receive_alert(member_id, source, description):
     print(f"[ALERT] Member: {member_id} | Source: {source} | {description}")
 
@@ -32,6 +32,15 @@ def evaluate_readings(member_id, member):
     baseline = member["baseline"]
     name = member["name"]
     alerts_found = False
+
+    # If no baseline exists apply generalized defaults 
+    if baseline is None:
+        print(f"[INFO] {name} ({member_id}) - no baseline established, applying generalized thresholds")
+        baseline = {
+            "heart_rate": 75,
+            "spo2": 97,
+            "skin_temp": 34.5
+        }
 
     # Check heart rate against absolute thresholds
     hr = current["heart_rate"]

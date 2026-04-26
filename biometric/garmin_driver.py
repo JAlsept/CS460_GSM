@@ -71,11 +71,7 @@ def get_biometric_data():
                 "motion": "stationary",
                 "fall_detected": False
             },
-            "baseline": {
-                "heart_rate": 63,
-                "spo2": 99,
-                "skin_temp": 33.9
-            }
+            "baseline": None
         },
         "005": {
             "member_id": "005",
@@ -103,11 +99,7 @@ def get_biometric_data():
                 "motion": "active",
                 "fall_detected": False
             },
-            "baseline": {
-                "heart_rate": 78,
-                "spo2": 98,
-                "skin_temp": 34.2
-            }
+            "baseline": None
         },
         "007": {
             "member_id": "007",
@@ -199,11 +191,7 @@ def get_biometric_data():
                 "motion": "stationary",
                 "fall_detected": False
             },
-            "baseline": {
-                "heart_rate": 69,
-                "spo2": 99,
-                "skin_temp": 33.8
-            }
+            "baseline": None
         },
         "013": {
             "member_id": "013",
