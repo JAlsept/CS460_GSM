@@ -1,0 +1,146 @@
+# Camera Analysis Controller - Processes video feeds from the CCTV Camera Driver
+# Sends video to the Gemini MLLM for analysis and forwards classified events to the Alert Controller
+#
+# SAD variables:
+#   camera_section   - identifies which gym section the camera feed belongs to
+#   camera_available - tracks whether the camera feed is currently active
+#   api_connected    - tracks whether the Gemini API is reachable and key is valid
+#   camera_events    - stores event type and severity results per section
+
+import os
+import json
+import time
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+from cctv_driver import get_camera_feeds
+
+load_dotenv()
+
+# Temporary - for testing purposes
+def receive_alert(member_id, source, description):
+    print(f"[ALERT] Member: {member_id} | Source: {source} | {description}")
+
+# Controller state variables 
+camera_section = None
+camera_available = False
+api_connected = False
+
+# stores event results per section so no data is overwritten between videos
+camera_events = {}
+
+# Initialize Gemini client using API key from .env
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+
+# Verifies the Gemini API is reachable before any video analysis is attempted
+def test_connection():
+    global api_connected
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents="Say 'GSM connection successful' and nothing else."
+    )
+    print("API Status:", response.text)
+    api_connected = True
+
+
+# Verifies the camera feed for the assigned section is available and readable
+def check_camera(video_path):
+    if os.path.exists(video_path):
+        print(f"[OK] Camera check passed: {video_path} is available")
+        return True
+    else:
+        print(f"[OFFLINE] Camera feed unavailable - {video_path} not found")
+        return False
+
+
+# Notifies the Alert Controller that the camera feed for the specified section is unavailable
+def report_camera_offline(section):
+    description = f"Camera feed offline for section: {section}"
+    receive_alert("N/A", "CameraAnalysisController", description)
+
+
+# Parses the JSON response from Gemini and stores event type and severity per section
+def parse_response(response_text, section):
+    global camera_events
+    parsed = json.loads(response_text)
+    camera_events[section] = {
+        "event_type": parsed.get("event_type", "none"),
+        "severity": parsed.get("severity", "none")
+    }
+    return parsed
+
+
+# Submits the video feed to the Gemini MLLM and forwards the classified event to the Alert Controller
+def analyze_frame(video_path, section):
+    with open(video_path, 'rb') as f:
+        video_bytes = f.read()
+
+    response = client.models.generate_content(
+        model="gemini-3-flash-preview",
+        contents=types.Content(
+            parts=[
+                types.Part(
+                    inline_data=types.Blob(
+                        data=video_bytes,
+                        mime_type='video/mp4'
+                    )
+                ),
+                types.Part(text="""Analyze this video and detect any safety or form related events.
+Respond ONLY in JSON format with no extra text or markdown backticks.
+Use this exact structure:
+{
+    "event_detected": true or false,
+    "event_type": "fall" or "poor_form" or "distress" or "none",
+    "severity": "critical" or "urgent" or "passive" or "none",
+    "section": "free_weights" or "cardio" or "weight_machines",
+    "description": "describe in detail what is happening in this video"
+}
+ 
+Guidelines:
+- fall: person loses balance, collapses, or is motionless on the floor
+- poor_form: unsafe exercise technique that could cause injury
+- distress: signs of physical pain or injury during exercise
+- severity critical: fall or serious injury requiring immediate emergency response
+- severity urgent: potentially dangerous condition requiring immediate staff response
+- severity passive: form correction or minor concern
+- severity none: normal activity detected
+""")
+            ]
+        )
+    )
+
+    parsed = parse_response(response.text, section)
+
+    # Forward to Alert Controller if an event was detected
+    if parsed.get("event_detected"):
+        description = f"[{section.upper()}] {parsed.get('description')}"
+        receive_alert("N/A", "CameraAnalysisController", description)
+    else:
+        print(f"[OK] No events detected in {section} section - {parsed.get('description')}")
+
+
+# Entry point for the Camera Analysis Controller
+# Loads all camera feeds from the CCTV driver and analyzes each available feed
+def run_camera_analysis():
+    print("Camera Analysis Controller started - scanning video feeds...\n")
+
+    test_connection()
+
+    feeds = get_camera_feeds()
+
+    for section, feed in feeds.items():
+        print(f"\nProcessing section: {section}")
+        if feed["camera_available"] and check_camera(feed["video_path"]):
+            analyze_frame(feed["video_path"], section)
+            print("Waiting before next API call...")
+            time.sleep(3)
+        else:
+            report_camera_offline(section)
+
+    print("\nCamera analysis complete.")
+
+
+# Temporary - for testing purposes only
+if __name__ == "__main__":
+    run_camera_analysis()
