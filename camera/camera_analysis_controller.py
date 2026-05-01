@@ -13,7 +13,7 @@ import time
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from cctv_driver import get_camera_feeds
+from cctv_driver import get_free_weights_feed, get_cardio_feed, get_weight_machines_feed
 
 load_dotenv()
 
@@ -119,24 +119,36 @@ Guidelines:
     else:
         print(f"[OK] No events detected in {section} section - {parsed.get('description')}")
 
+# Determines which driver method to call based on the section being entered
+# Called by the GUI when a demo person enters a specific gym section
+def analyze_section(section):
+    print(f"\nProcessing section: {section}")
+    if section == "free_weights":
+        video_path = get_free_weights_feed()
+    elif section == "cardio":
+        video_path = get_cardio_feed()
+    elif section == "weight_machines":
+        video_path = get_weight_machines_feed()
+    else:
+        print(f"[ERROR] Unknown section: {section}")
+        return
+ 
+    if check_camera(video_path):
+        analyze_frame(video_path, section)
+    else:
+        report_camera_offline(section)
 
 # Entry point for the Camera Analysis Controller
-# Loads all camera feeds from the CCTV driver and analyzes each available feed
+# For testing purposes cycles through all three sections
 def run_camera_analysis():
     print("Camera Analysis Controller started - scanning video feeds...\n")
 
     test_connection()
 
-    feeds = get_camera_feeds()
-
-    for section, feed in feeds.items():
-        print(f"\nProcessing section: {section}")
-        if feed["camera_available"] and check_camera(feed["video_path"]):
-            analyze_frame(feed["video_path"], section)
-            print("Waiting before next API call...")
-            time.sleep(3)
-        else:
-            report_camera_offline(section)
+    for section in ["free_weights", "cardio", "weight_machines"]:
+        analyze_section(section)
+        print("Waiting before next API call...")
+        time.sleep(3)
 
     print("\nCamera analysis complete.")
 
