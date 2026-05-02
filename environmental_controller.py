@@ -176,8 +176,5 @@ def run_environmental_monitoring():
     print("\nEnvironmental scan complete.")
     gsm_data_store.print_store_summary()
 
-
-# Temporary - for testing purposes only
-# Once GSM Controller is built this will be called from there instead
 if __name__ == "__main__":
     run_environmental_monitoring()

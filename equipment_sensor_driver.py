@@ -4,9 +4,7 @@
 
 import gsm_data_store
 
-
-# Reads mock equipment sensor data and writes each record directly to the GSM Data Store
-# In the real system, this would receive live data from sensors embedded in each machine
+# All intensity levels are on a 1-10 scale.
 def load_equipment_data():
     data = {
 
@@ -16,7 +14,7 @@ def load_equipment_data():
             "section": "free_weights",
             "machine_type": "bench_press",
             "in_use": True,
-            "intensity_level": 3,       # weight setting (1-10 scale)
+            "intensity_level": 3,
             "duration_minutes": 18
         },
         "EQ_FW_02": {
@@ -42,7 +40,7 @@ def load_equipment_data():
             "section": "cardio",
             "machine_type": "treadmill",
             "in_use": True,
-            "intensity_level": 7,       # speed setting (1-10 scale)
+            "intensity_level": 7,
             "duration_minutes": 45
         },
         "EQ_CA_02": {
@@ -76,7 +74,7 @@ def load_equipment_data():
             "section": "weight_machines",
             "machine_type": "lat_pulldown",
             "in_use": True,
-            "intensity_level": 4,       # resistance setting (1-10 scale)
+            "intensity_level": 4,
             "duration_minutes": 9
         },
         "EQ_WM_02": {
@@ -111,9 +109,6 @@ def load_equipment_data():
 
     print(f"[EQUIPMENT DRIVER] {len(data)} equipment records written to data store")
 
-
-# Temporary - for testing purposes only
-# Once GSM Controller is built this will be called from there instead
 if __name__ == "__main__":
     gsm_data_store.initialize()
     load_equipment_data()

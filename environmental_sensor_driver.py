@@ -15,22 +15,22 @@ def get_environmental_data():
         "free_weights": {
             "section": "free_weights",
             "sensor_available": True,
-            "temperature": 71.8,    # normal
-            "air_quality": 870.0,   # normal
-            "humidity": 45.0        # normal
+            "temperature": 71.8,
+            "air_quality": 870.0,
+            "humidity": 45.0
         },
 
         "cardio": {
             "section": "cardio",
             "sensor_available": True,
-            "temperature": 81.3,    # above threshold - elevated from heavy cardio use
-            "air_quality": 1250.0,  # above threshold - CO2 elevated from exertion
-            "humidity": 68.2        # above threshold - high moisture from activity
+            "temperature": 81.3,
+            "air_quality": 1250.0,
+            "humidity": 68.2
         },
 
         "weight_machines": {
             "section": "weight_machines",
-            "sensor_available": False,  # sensor offline - triggers report_sensor_offline
+            "sensor_available": False,
             "temperature": None,
             "humidity": None,
             "air_quality": None
