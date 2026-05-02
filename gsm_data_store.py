@@ -7,8 +7,6 @@
 #                               - replace self.members[member_id] writes with update_member()
 #   BiometricController         - replace get_biometric_data() baseline lookups with get_member()
 #                               - replace session data writes with update_member()
-#   EnvironmentalController     - no member data needed, use log_alert() and get_equipment_usage()
-#   EquipmentSensorDriver       - replace return statement with write_equipment_usage() calls
 #   AlertController             - use log_alert() to store alert summaries
 #   ReportController            - use get_alert_log(), get_equipment_usage(), get_occupancy_log()
 
