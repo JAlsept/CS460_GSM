@@ -8,6 +8,7 @@
 #   spo2_low                - below 95% blood oxygen is concerning
 #   skin_temp_high          - above 37.5C skin temperature is elevated
 
+import gsm_data_store
 from garmin_driver import get_biometric_data
 # from alert_controller import receive_alert
 
@@ -26,14 +27,18 @@ THRESHOLDS = {
 
 
 # Compares a member's current biometric readings against medical thresholds
-# Forwards any flagged readings to the Alert Controller
+# Pulls baseline from the GSM Data Store 
+# Forwards any flagged readings to the Alert Controller and logs them to the data store
 def evaluate_readings(member_id, member):
     current = member["current"]
-    baseline = member["baseline"]
     name = member["name"]
     alerts_found = False
 
-    # If no baseline exists apply generalized defaults 
+    # Pull baseline from data store instead of driver
+    profile = gsm_data_store.get_member(member_id)
+    baseline = profile["baseline"] if profile else None
+
+    # If no baseline exists apply generalized defaults (per SAD - new member handling)
     if baseline is None:
         print(f"[INFO] {name} ({member_id}) - no baseline established, applying generalized thresholds")
         baseline = {
@@ -47,11 +52,27 @@ def evaluate_readings(member_id, member):
     if hr < THRESHOLDS["heart_rate_low"]:
         description = f"{name} heart rate critically low at {hr} bpm"
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_HR_LOW_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "critical",
+            "acknowledged": False
+        })
         alerts_found = True
 
     elif hr > THRESHOLDS["heart_rate_high"]:
         description = f"{name} heart rate critically high at {hr} bpm"
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_HR_HIGH_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "critical",
+            "acknowledged": False
+        })
         alerts_found = True
 
     # Check heart rate against personal baseline (30% above baseline per SAD)
@@ -62,6 +83,14 @@ def evaluate_readings(member_id, member):
             f"personal baseline of {baseline_hr} bpm"
         )
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_HR_BASELINE_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "urgent",
+            "acknowledged": False
+        })
         alerts_found = True
 
     # Check blood oxygen saturation
@@ -69,6 +98,14 @@ def evaluate_readings(member_id, member):
     if spo2 < THRESHOLDS["spo2_low"]:
         description = f"{name} SpO2 low at {spo2}%"
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_SPO2_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "urgent",
+            "acknowledged": False
+        })
         alerts_found = True
 
     # Check skin temperature
@@ -76,31 +113,56 @@ def evaluate_readings(member_id, member):
     if skin_temp > THRESHOLDS["skin_temp_high"]:
         description = f"{name} skin temperature elevated at {skin_temp}C"
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_TEMP_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "urgent",
+            "acknowledged": False
+        })
         alerts_found = True
 
     # Check fall detection
     if current["fall_detected"]:
         description = f"{name} fall detected"
         receive_alert(member_id, "BiometricController", description)
+        gsm_data_store.log_alert({
+            "alert_id": f"BIO_FALL_{member_id}",
+            "source": "BiometricController",
+            "member_id": member_id,
+            "description": description,
+            "severity": "critical",
+            "acknowledged": False
+        })
         alerts_found = True
 
     return alerts_found
 
 
 # Entry point for the Biometric Controller
-# Loads all member data from the Garmin driver and evaluates each member's readings
+# Initializes the data store, loads all member data from the Garmin driver
+# and evaluates each member's readings
 def run_biometric_monitoring():
     print("Biometric Controller started - scanning member readings...\n")
+
+    gsm_data_store.initialize()
+
     members = get_biometric_data()
 
     for member_id, member in members.items():
         flagged = evaluate_readings(member_id, member)
-        if not flagged:
+        if flagged:
+            continue
+        else:
             print(f"[OK] {member['name']} ({member_id}) - all readings normal")
+        
 
     print("\nBiometric scan complete.")
+    gsm_data_store.print_store_summary()
+
 
 # Temporary - for testing purposes only
-# Once GSM Controller is built this will be called from there instead
+# Once the Staff Monitoring Console is built this will be called from there instead
 if __name__ == "__main__":
     run_biometric_monitoring()

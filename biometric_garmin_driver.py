@@ -8,6 +8,11 @@
 #   skin_temp     - skin surface temperature in Celsius
 #   motion        - current activity state of the member ("active" or "stationary")
 #   fall_detected - whether the watch has detected a fall event (True/False)
+#
+# Demo alert breakdown:
+#   Flagged (5): 003 Thomas - low SpO2, 008 Adrian - fall, 009 Jacob - critical,
+#                013 Mia - critical, 015 Joshua - fall
+#   Normal (10): 001, 002, 004, 005, 006, 007, 010, 011, 012, 014
 
 # Returns a dictionary of mock biometric readings for active gym members
 def get_biometric_data():
@@ -22,27 +27,17 @@ def get_biometric_data():
                 "skin_temp": 34.1,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 70,
-                "spo2": 98,
-                "skin_temp": 34.0
             }
         },
         "002": {
             "member_id": "002",
             "name": "Brian Castillo",
             "current": {
-                "heart_rate": 155,
+                "heart_rate": 80,
                 "spo2": 97,
-                "skin_temp": 35.2,
+                "skin_temp": 34.5,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 75,
-                "spo2": 97,
-                "skin_temp": 34.5
             }
         },
         "003": {
@@ -54,11 +49,6 @@ def get_biometric_data():
                 "skin_temp": 34.8,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 85,
-                "spo2": 97,
-                "skin_temp": 34.6
             }
         },
         "004": {
@@ -70,23 +60,17 @@ def get_biometric_data():
                 "skin_temp": 33.8,
                 "motion": "stationary",
                 "fall_detected": False
-            },
-            "baseline": None
+            }
         },
         "005": {
             "member_id": "005",
             "name": "Elena Sanchez",
             "current": {
-                "heart_rate": 110,
-                "spo2": 96,
-                "skin_temp": 35.5,
+                "heart_rate": 82,
+                "spo2": 97,
+                "skin_temp": 34.7,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 78,
-                "spo2": 97,
-                "skin_temp": 34.7
             }
         },
         "006": {
@@ -98,39 +82,28 @@ def get_biometric_data():
                 "skin_temp": 34.3,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": None
+            }
         },
         "007": {
             "member_id": "007",
             "name": "Isabell Garcia",
             "current": {
-                "heart_rate": 95,
-                "spo2": 93,
-                "skin_temp": 36.1,
+                "heart_rate": 75,
+                "spo2": 97,
+                "skin_temp": 34.4,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 72,
-                "spo2": 98,
-                "skin_temp": 34.4
             }
         },
         "008": {
             "member_id": "008",
-            "name": "Adrian Calderon ",
+            "name": "Adrian Calderon",
             "current": {
                 "heart_rate": 68,
                 "spo2": 97,
                 "skin_temp": 34.0,
                 "motion": "stationary",
                 "fall_detected": True
-            },
-            "baseline": {
-                "heart_rate": 66,
-                "spo2": 97,
-                "skin_temp": 34.1
             }
         },
         "009": {
@@ -142,11 +115,6 @@ def get_biometric_data():
                 "skin_temp": 37.8,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 80,
-                "spo2": 97,
-                "skin_temp": 34.9
             }
         },
         "010": {
@@ -158,27 +126,17 @@ def get_biometric_data():
                 "skin_temp": 34.6,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 74,
-                "spo2": 98,
-                "skin_temp": 34.5
             }
         },
         "011": {
             "member_id": "011",
             "name": "Karen Johnson",
             "current": {
-                "heart_rate": 102,
-                "spo2": 95,
-                "skin_temp": 35.9,
+                "heart_rate": 79,
+                "spo2": 97,
+                "skin_temp": 34.3,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 76,
-                "spo2": 97,
-                "skin_temp": 34.3
             }
         },
         "012": {
@@ -190,8 +148,7 @@ def get_biometric_data():
                 "skin_temp": 33.7,
                 "motion": "stationary",
                 "fall_detected": False
-            },
-            "baseline": None
+            }
         },
         "013": {
             "member_id": "013",
@@ -202,11 +159,6 @@ def get_biometric_data():
                 "skin_temp": 38.2,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 82,
-                "spo2": 97,
-                "skin_temp": 35.0
             }
         },
         "014": {
@@ -215,32 +167,21 @@ def get_biometric_data():
             "current": {
                 "heart_rate": 85,
                 "spo2": 96,
-                "skin_temp": 35.1,
+                "skin_temp": 34.8,
                 "motion": "active",
                 "fall_detected": False
-            },
-            "baseline": {
-                "heart_rate": 82,
-                "spo2": 97,
-                "skin_temp": 34.8
             }
         },
         "015": {
             "member_id": "015",
-            "name": "Johua Potter",
+            "name": "Joshua Potter",
             "current": {
                 "heart_rate": 55,
                 "spo2": 98,
                 "skin_temp": 34.2,
                 "motion": "stationary",
                 "fall_detected": True
-            },
-            "baseline": {
-                "heart_rate": 68,
-                "spo2": 98,
-                "skin_temp": 34.1
             }
         }
     }
     return data
-   
