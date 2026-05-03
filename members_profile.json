@@ -1,0 +1,167 @@
+{
+  "001": {
+    "member_id": "001",
+    "name": "Alice Monroe",
+    "weight": "137",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 70, "spo2": 98, "skin_temp": 34.0 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "002": {
+    "member_id": "002",
+    "name": "Brian Castillo",
+    "weight": "188",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 75, "spo2": 97, "skin_temp": 34.5 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "003": {
+    "member_id": "003",
+    "name": "Thomas Reyes",
+    "weight": "174",
+    "restrictions": ["lower back strain"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 85, "spo2": 97, "skin_temp": 34.6 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "004": {
+    "member_id": "004",
+    "name": "David Lucero",
+    "weight": "154",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": null,
+    "profile_complete": false,
+    "checked_in": false,
+    "device_id": null
+  },
+  "005": {
+    "member_id": "005",
+    "name": "Elena Sanchez",
+    "weight": "128",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 78, "spo2": 97, "skin_temp": 34.7 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "006": {
+    "member_id": "006",
+    "name": "Frank Allen",
+    "weight": "200",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": null,
+    "profile_complete": false,
+    "checked_in": false,
+    "device_id": null
+  },
+  "007": {
+    "member_id": "007",
+    "name": "Isabell Garcia",
+    "weight": "143",
+    "restrictions": ["knee injury"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 72, "spo2": 98, "skin_temp": 34.4 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "008": {
+    "member_id": "008",
+    "name": "Adrian Calderon",
+    "weight": "194",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 66, "spo2": 97, "skin_temp": 34.1 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "009": {
+    "member_id": "009",
+    "name": "Jacob Torres",
+    "weight": "163",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 80, "spo2": 97, "skin_temp": 34.9 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "010": {
+    "member_id": "010",
+    "name": "James Carmody",
+    "weight": "181",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 74, "spo2": 98, "skin_temp": 34.5 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "011": {
+    "member_id": "011",
+    "name": "Karen Johnson",
+    "weight": "149",
+    "restrictions": ["shoulder surgery recovery"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 76, "spo2": 97, "skin_temp": 34.3 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "012": {
+    "member_id": "012",
+    "name": "Katherine Jones",
+    "weight": "119",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": null,
+    "profile_complete": false,
+    "checked_in": false,
+    "device_id": null
+  },
+  "013": {
+    "member_id": "013",
+    "name": "Mia Gonzales",
+    "weight": "132",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 82, "spo2": 97, "skin_temp": 35.0 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "014": {
+    "member_id": "014",
+    "name": "Jesse Sandoval",
+    "weight": "170",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 82, "spo2": 97, "skin_temp": 34.8 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  },
+  "015": {
+    "member_id": "015",
+    "name": "Joshua Potter",
+    "weight": "150",
+    "restrictions": ["None"],
+    "has_consent": true,
+    "baseline": { "heart_rate": 68, "spo2": 98, "skin_temp": 34.1 },
+    "profile_complete": true,
+    "checked_in": false,
+    "device_id": null
+  }
+}
