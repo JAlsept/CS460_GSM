@@ -3,8 +3,6 @@
 # All controllers read from and write to this module in place of their current mock/stub setups.
 #
 # Wiring instructions per controller:
-#   CheckInTerminal_Controller  - replace self.members = self.ui.get_mock_members() with get_all_members()
-#                               - replace self.members[member_id] writes with update_member()
 #   BiometricController         - replace get_biometric_data() baseline lookups with get_member()
 #                               - replace session data writes with update_member()
 #   AlertController             - use log_alert() to store alert summaries
