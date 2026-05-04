@@ -2,10 +2,10 @@
 # Handles member arrivals, departures, profile updates, and new registrations
 # Tracks facility occupancy
 
+import gsm_data_store
 from CheckInTerminal_Driver import CheckInTerminal_Driver
 
-# Temporary stub - replace with real start_monitoring call once Biometric Controller is fully implemented
-def start_monitoring(member_id):
+def run_biometric_monitoring(member_id):
     print(f"  [BIOMETRIC] Monitoring started for member {member_id}")
 
 
@@ -17,12 +17,7 @@ class CheckInTerminal_Controller:
         self.max_capacity = 16
         self.ui = CheckInTerminal_Driver()
 
-        # Temporary - load mock members from driver
-        # When data_store is ready, replace with a data_store lookup instead
-        self.members = self.ui.get_mock_members()
-
-
-    # Handles incoming member ID and enforces digit-only validation
+    # Handles incoming member ID scans from the terminal
     def receive_scan(self, member_id):
         if not member_id.isdigit():
             print(f"[REJECTED] '{member_id}' is not a valid member ID.")
@@ -37,7 +32,7 @@ class CheckInTerminal_Controller:
             self.ui.display_message("Facility is at maximum capacity - entry denied")
             return
 
-        profile = self.members.get(member_id)
+        profile = gsm_data_store.get_member(member_id)
 
         if profile and profile.get("checked_in"):
             self.ui.display_message(f"Member {member_id} is already checked in")
@@ -49,7 +44,7 @@ class CheckInTerminal_Controller:
     # Retrieves the member profile from datastore
     # If the member is not found, pivots to registration
     def load_profile(self, member_id):
-        profile = self.members.get(member_id)
+        profile = gsm_data_store.get_member(member_id)
 
         if profile:
             self.current_profile = profile
@@ -60,7 +55,7 @@ class CheckInTerminal_Controller:
 
     # Applies changes such as weight or restriction updates before a session
     def update_profile(self, member_id, updates):
-        profile = self.members.get(member_id)
+        profile = gsm_data_store.get_member(member_id)
 
         if not profile:
             self.ui.display_message(f"No profile found for member {member_id}")
@@ -71,7 +66,7 @@ class CheckInTerminal_Controller:
                 profile[field] = value
                 print(f"  [UPDATE] {field} -> {value}")
 
-        self.members[member_id] = profile
+        gsm_data_store.update_member(member_id, profile)
         self.current_profile = profile
         self.finalize_session(member_id)
 
@@ -102,7 +97,7 @@ class CheckInTerminal_Controller:
             "device_id": None
         }
 
-        self.members[member_id] = new_profile
+        gsm_data_store.update_member(member_id, new_profile)
         print(f"[INFO] Profile created for {new_profile['name']} (ID: {member_id})")
         print(f"[INFO] Generalized thresholds active until two-week baseline is established")
 
@@ -118,7 +113,7 @@ class CheckInTerminal_Controller:
         self.current_profile["checked_in"] = True
         self.current_profile["device_id"] = device_id
 
-        self.members[member_id] = self.current_profile
+        gsm_data_store.update_member(member_id, self.current_profile)
 
         self.link_device(member_id, device_id)
 
@@ -129,12 +124,12 @@ class CheckInTerminal_Controller:
     # Signals the Biometric Controller to begin monitoring for this member
     def link_device(self, member_id, device_id):
         print(f"  [SIGNAL] Linking {device_id} to member {member_id}...")
-        start_monitoring(member_id)
+        run_biometric_monitoring(member_id)
 
 
     # Handles a member leaving the facility
     def process_exit(self, member_id):
-        profile = self.members.get(member_id)
+        profile = gsm_data_store.get_member(member_id)
 
         if not profile:
             self.ui.display_message(f"No profile found for member {member_id}")
@@ -144,12 +139,12 @@ class CheckInTerminal_Controller:
         profile["checked_in"] = False
         profile["device_id"] = None
 
-        self.members[member_id] = profile
+        gsm_data_store.update_member(member_id, profile)
 
 
-# Temporary - using mock events from the driver
-# When GSM Controller is built, this will be called from there instead
+# Temporary - for testing purposes only using mock events from the driver
 if __name__ == "__main__":
+    gsm_data_store.initialize("members_profile.json")
     controller = CheckInTerminal_Controller()
 
     print("=== GYM SAFETY MONITOR: TERMINAL ACTIVE ===\n")

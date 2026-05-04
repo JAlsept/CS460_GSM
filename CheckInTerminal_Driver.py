@@ -5,16 +5,7 @@ class CheckInTerminal_Driver:
     def __init__(self):
         self.location = "Main Entrance"
 
-
-    # Returns hardcoded member profiles for testing purposes
-    # Replace with a live data_store lookup when the shared data_store is ready
-    def get_mock_members(self):
-        with open("members_profile.json", "r") as file:
-            return json.load(file)
-
-
-    # Temporary - returns a scripted list of terminal events
-    # Replaced by the GSM Controller when it is built
+    # Temporary - for testing purposes only: returns a scripted list of terminal events
     def get_mock_events(self):
         return [
             {"event_type": "check_in", "member_id": "001"},
