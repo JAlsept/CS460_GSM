@@ -21,8 +21,8 @@ load_dotenv()
 # Temporary - for testing purposes
 # Replace with Ashley's import 
 # from alert_controller import receive_alert
-def receive_alert(member_id, source, description):
-    print(f"[ALERT] Member: {member_id} | Source: {source} | {description}")
+# def receive_alert(member_id, source, description):
+#     print(f"[ALERT] Member: {member_id} | Source: {source} | {description}")
 
 # Controller state variables (per SAD)
 camera_section = None
@@ -59,17 +59,17 @@ def check_camera(video_path):
 
 
 # Notifies the Alert Controller that the camera feed for the specified section is unavailable
-def report_camera_offline(section):
+def report_camera_offline(section, alert_controller):
     description = f"Camera feed offline for section: {section}"
-    receive_alert("N/A", "CameraAnalysisController", description)
-    gsm_data_store.log_alert({
-        "alert_id": f"CAM_OFFLINE_{section.upper()}",
-        "source": "CameraAnalysisController",
-        "member_id": "N/A",
-        "description": description,
-        "severity": "passive",
-        "acknowledged": False
-    })
+    alert_controller.receive_alert("N/A", "CameraAnalysisController", description)
+    # gsm_data_store.log_alert({
+    #     "alert_id": f"CAM_OFFLINE_{section.upper()}",
+    #     "source": "CameraAnalysisController",
+    #     "member_id": "N/A",
+    #     "description": description,
+    #     "severity": "passive",
+    #     "acknowledged": False
+    # })
 
 
 # Parses the JSON response from Gemini and stores event type and severity per section
@@ -84,7 +84,7 @@ def parse_response(response_text, section):
 
 
 # Submits the video feed to the Gemini MLLM and forwards the classified event to the Alert Controller
-def analyze_frame(video_path, section):
+def analyze_frame(video_path, section, alert_controller):
     with open(video_path, 'rb') as f:
         video_bytes = f.read()
 
@@ -117,6 +117,12 @@ Guidelines:
 - severity urgent: potentially dangerous condition requiring immediate staff response
 - severity passive: form correction or minor concern
 - severity none: normal activity detected
+
+IMPORTANT - you must include one of these exact phrases in your description field:
+- If event_type is fall: include the phrase "fall detected" somewhere in the description
+- If event_type is distress: include the phrase "distress detected" somewhere in the description
+- If event_type is poor_form: include the phrase "poor form detected" somewhere in the description
+- If event_type is none: include the phrase "no event detected" somewhere in the description
 """)
             ]
         )
@@ -127,22 +133,22 @@ Guidelines:
     # Forward to Alert Controller and log to data store if an event was detected
     if parsed.get("event_detected"):
         description = f"[{section.upper()}] {parsed.get('description')}"
-        receive_alert("N/A", "CameraAnalysisController", description)
-        gsm_data_store.log_alert({
-            "alert_id": f"CAM_{parsed.get('event_type', 'EVENT').upper()}_{section.upper()}",
-            "source": "CameraAnalysisController",
-            "member_id": "N/A",
-            "description": description,
-            "severity": parsed.get("severity", "none"),
-            "acknowledged": False
-        })
+        alert_controller.receive_alert("N/A", "CameraAnalysisController", description)
+        # gsm_data_store.log_alert({
+        #     "alert_id": f"CAM_{parsed.get('event_type', 'EVENT').upper()}_{section.upper()}",
+        #     "source": "CameraAnalysisController",
+        #     "member_id": "N/A",
+        #     "description": description,
+        #     "severity": parsed.get("severity", "none"),
+        #     "acknowledged": False
+        # })
     else:
         print(f"[OK] No events detected in {section} section - {parsed.get('description')}")
 
 
 # Determines which driver method to call based on the section being entered
 # Called by the GUI when a demo person enters a specific gym section
-def analyze_section(section):
+def analyze_section(section, alert_controller):
     print(f"\nProcessing section: {section}")
     if section == "free_weights":
         video_path = get_free_weights_feed()
@@ -155,27 +161,27 @@ def analyze_section(section):
         return
 
     if check_camera(video_path):
-        analyze_frame(video_path, section)
+        analyze_frame(video_path, section, alert_controller)
     else:
-        report_camera_offline(section)
+        report_camera_offline(section, alert_controller)
 
 
 # Entry point for the Camera Analysis Controller
 # For testing purposes cycles through all three sections
 # In the full demo the GUI will call analyze_section() directly
-def run_camera_analysis():
+def run_camera_analysis(alert_controller):
     print("Camera Analysis Controller started - scanning video feeds...\n")
 
-    gsm_data_store.initialize()
+#    gsm_data_store.initialize()
     test_connection()
 
     for section in ["free_weights", "cardio", "weight_machines"]:
-        analyze_section(section)
+        analyze_section(section, alert_controller)
         print("Waiting before next API call...")
         time.sleep(3)
 
     print("\nCamera analysis complete.")
-    gsm_data_store.print_store_summary()
+    # gsm_data_store.print_store_summary()
 
 
 # Temporary - for testing purposes only
