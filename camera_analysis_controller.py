@@ -15,14 +15,14 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from camera_cctv_driver import get_free_weights_feed, get_cardio_feed, get_weight_machines_feed
+from alert_controller import AlertController
+from report_controller import ReportController
 
 load_dotenv()
 
-# Temporary - for testing purposes
-# Replace with Ashley's import 
-# from alert_controller import receive_alert
-def receive_alert(member_id, source, description):
-    print(f"[ALERT] Member: {member_id} | Source: {source} | {description}")
+# Initialize Report and Alert Controllers
+report_controller = ReportController()
+alert_controller = AlertController(report_controller)
 
 # Controller state variables (per SAD)
 camera_section = None
@@ -61,15 +61,7 @@ def check_camera(video_path):
 # Notifies the Alert Controller that the camera feed for the specified section is unavailable
 def report_camera_offline(section):
     description = f"Camera feed offline for section: {section}"
-    receive_alert("N/A", "CameraAnalysisController", description)
-    gsm_data_store.log_alert({
-        "alert_id": f"CAM_OFFLINE_{section.upper()}",
-        "source": "CameraAnalysisController",
-        "member_id": "N/A",
-        "description": description,
-        "severity": "passive",
-        "acknowledged": False
-    })
+    alert_controller.receive_alert("N/A", "CameraAnalysisController", description)
 
 
 # Parses the JSON response from Gemini and stores event type and severity per section
