@@ -14,6 +14,8 @@ class AlertController:
         self.alert_escalation = 15 # For testing 15 seconds
         self.alert_counter = 0
         self.report_controller = report_controller
+        self.on_escalation = None # alert escalation
+        self.on_alert = None # new alert
 
     # Keywords that trigger a critical alert
     # Immediate emergency response
@@ -82,6 +84,10 @@ class AlertController:
         print(f"\n[Passive Alert] Member {member_id}: {message}")
         print("[Alert] Notification sent to Garmin Venu 3")
 
+        # Tell GUI
+        if self.on_alert:
+            self.on_alert(member_id, alert_id, message, "passive")
+
         # Start timer
         timer = threading.Timer(
             self.alert_escalation,
@@ -98,6 +104,10 @@ class AlertController:
         print(f"\n[Urgent Alert] Member {member_id}: {message}")
         print("[Alert] Notification sent to Garmin Venu 3")
         print("[Alert] Notification sent to Staff Monitoring Console")
+
+        # Tell GUI 
+        if self.on_alert:
+            self.on_alert(member_id, alert_id, message, "urgent")
 
         # Start timer
         timer = threading.Timer(
@@ -117,6 +127,9 @@ class AlertController:
         print("[Alert] Notification sent to Staff Monitoring Console")
         print("[Alert] Emergency response signal sent to emergency services")
 
+        # Tell GUI 
+        if self.on_escalation:
+            self.on_escalation(member_id, alert_id, message)
 
     # Dismisses an active alert and cancels the escalation timer
     # Called when a member or staff member acknowledges the alert
