@@ -9,7 +9,7 @@
 #   skin_temp_high          - above 37.5C skin temperature is elevated
 
 import gsm_data_store
-from garmin_driver import get_biometric_data
+from biometric_garmin_driver import get_biometric_data
 # from alert_controller import receive_alert
 
 # Temporary - for testing purposes
