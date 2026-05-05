@@ -1,12 +1,5 @@
 # GSM Data Store - Centralized in-memory data store for the Gym Space Monitoring system.
 # Holds member profiles, equipment usage records, alert summaries, occupancy data, and session logs.
-# All controllers read from and write to this module in place of their current mock/stub setups.
-#
-# Wiring instructions per controller:
-#   BiometricController         - replace get_biometric_data() baseline lookups with get_member()
-#                               - replace session data writes with update_member()
-#   AlertController             - use log_alert() to store alert summaries
-#   ReportController            - use get_alert_log(), get_equipment_usage(), get_occupancy_log()
 
 import json
 from datetime import datetime

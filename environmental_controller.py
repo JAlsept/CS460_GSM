@@ -10,15 +10,12 @@
 
 import gsm_data_store
 from environmental_sensor_driver import get_environmental_data
-# from alert_controller import receive_alert
+from alert_controller import AlertController
+from report_controller import ReportController
 
-# Temporary - for testing purposes
-def receive_alert(source, description):
-    print(f"  [ALERT] Source: {source} | {description}")
-
-# Temporary - for testing purposes
-def report_log_readings(section, readings):
-    print(f"  [REPORT] Readings logged for section: {section} | {readings}")
+# Initialize Report and Alert Controllers
+report_controller = ReportController()
+alert_controller = AlertController(report_controller)
 
 # Safe operating thresholds for each environmental reading type
 THRESHOLDS = {
@@ -36,6 +33,8 @@ class EnvironmentalController:
         self.air_quality      = None
         self.humidity         = None
         self.sensor_available = False
+        self.alert_controller  = alert_controller
+        self.report_controller = report_controller
 
 
     # Updates stored readings with the latest data from the sensor driver
@@ -54,71 +53,31 @@ class EnvironmentalController:
         if self.temperature is not None:
             if self.temperature > THRESHOLDS["temperature_high"]:
                 description = f"[{section.upper()}] Temperature elevated at {self.temperature}F (threshold: {THRESHOLDS['temperature_high']}F)"
-                receive_alert("EnvironmentalController", description)
-                gsm_data_store.log_alert({
-                    "alert_id": f"ENV_TEMP_{section.upper()}",
-                    "source": "EnvironmentalController",
-                    "member_id": "N/A",
-                    "description": description,
-                    "severity": "urgent",
-                    "acknowledged": False
-                })
+                self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
                 alerts_found = True
 
             elif self.temperature < THRESHOLDS["temperature_low"]:
                 description = f"[{section.upper()}] Temperature too low at {self.temperature}F (threshold: {THRESHOLDS['temperature_low']}F)"
-                receive_alert("EnvironmentalController", description)
-                gsm_data_store.log_alert({
-                    "alert_id": f"ENV_TEMP_{section.upper()}",
-                    "source": "EnvironmentalController",
-                    "member_id": "N/A",
-                    "description": description,
-                    "severity": "urgent",
-                    "acknowledged": False
-                })
+                self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
                 alerts_found = True
 
         # Check air quality
         if self.air_quality is not None:
             if self.air_quality > THRESHOLDS["air_quality_high"]:
                 description = f"[{section.upper()}] Air quality elevated at {self.air_quality} ppm CO2 (threshold: {THRESHOLDS['air_quality_high']} ppm)"
-                receive_alert("EnvironmentalController", description)
-                gsm_data_store.log_alert({
-                    "alert_id": f"ENV_AQ_{section.upper()}",
-                    "source": "EnvironmentalController",
-                    "member_id": "N/A",
-                    "description": description,
-                    "severity": "urgent",
-                    "acknowledged": False
-                })
+                self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
                 alerts_found = True
 
         # Check humidity
         if self.humidity is not None:
             if self.humidity > THRESHOLDS["humidity_high"]:
                 description = f"[{section.upper()}] Humidity elevated at {self.humidity}% (threshold: {THRESHOLDS['humidity_high']}%)"
-                receive_alert("EnvironmentalController", description)
-                gsm_data_store.log_alert({
-                    "alert_id": f"ENV_HUM_{section.upper()}",
-                    "source": "EnvironmentalController",
-                    "member_id": "N/A",
-                    "description": description,
-                    "severity": "urgent",
-                    "acknowledged": False
-                })
+                self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
                 alerts_found = True
 
             elif self.humidity < THRESHOLDS["humidity_low"]:
                 description = f"[{section.upper()}] Humidity too low at {self.humidity}% (threshold: {THRESHOLDS['humidity_low']}%)"
-                receive_alert("EnvironmentalController", description)
-                gsm_data_store.log_alert({
-                    "alert_id": f"ENV_HUM_{section.upper()}",
-                    "source": "EnvironmentalController",
-                    "member_id": "N/A",
-                    "description": description,
-                    "severity": "urgent",
-                    "acknowledged": False
-                })
+                self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
                 alerts_found = True
 
         return alerts_found
@@ -127,26 +86,17 @@ class EnvironmentalController:
     # Notifies the Alert Controller that the sensor for the specified section is offline
     def report_sensor_offline(self, section):
         description = f"Environmental sensor offline for section: {section}"
-        receive_alert("EnvironmentalController", description)
-        gsm_data_store.log_alert({
-            "alert_id": f"ENV_OFFLINE_{section.upper()}",
-            "source": "EnvironmentalController",
-            "member_id": "N/A",
-            "description": description,
-            "severity": "passive",
-            "acknowledged": False
-        })
+        self.alert_controller.receive_alert("N/A", "EnvironmentalController", description)
 
 
     # Forwards current readings to the Report Controller for logging
     def log_readings(self, section):
-        readings = {
-            "section":     section,
-            "temperature": self.temperature,
-            "air_quality": self.air_quality,
-            "humidity":    self.humidity,
-        }
-        report_log_readings(section, readings)
+        if self.temperature is not None:
+            self.report_controller.log_environmental(f"{section}_temperature", self.temperature)
+        if self.air_quality is not None:
+            self.report_controller.log_environmental(f"{section}_air_quality", self.air_quality)
+        if self.humidity is not None:
+            self.report_controller.log_environmental(f"{section}_humidity", self.humidity)
 
 
 # Entry point for the Environmental Controller
