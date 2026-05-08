@@ -590,7 +590,6 @@ class GymFloor(QWidget):
         # cache the current member name floating next to the dot
         self.dot_label = "(no member)"
 
-    # qt properties so QPropertyAnimation can tween the dot
     def get_dot_x(self):
         return self._dot_x
 
@@ -634,7 +633,7 @@ class GymFloor(QWidget):
         return self._abs_to_pixel(x_norm, y_norm)
 
     def _abs_to_pixel(self, x_norm, y_norm):
-        # leave a bit of padding so labels don't kiss the edge
+        # leave a bit of padding so labels don't touch the edge
         pad = 24
         w = self.width() - 2 * pad
         h = self.height() - 2 * pad
